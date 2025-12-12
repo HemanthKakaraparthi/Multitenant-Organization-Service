@@ -1,0 +1,66 @@
+🧩 Design Choices (Brief Notes)
+1. Flask as the Web Framework
+
+Chosen for its simplicity, lightweight nature, and flexibility.
+
+Easy to structure small-to-medium microservices with clear API endpoints.
+
+Fast to develop and integrates well with MongoDB drivers.
+
+2. MongoDB for Multitenant Data
+
+MongoDB’s schema-flexible design allows dynamic creation of collections per organization.
+
+Avoids the overhead of managing multiple databases.
+
+Makes multi-tenant isolation easy by using collection prefixes like org_<name>_....
+
+3. Per-Organization Collection Model
+
+Each organization gets its own set of collections instead of sharing tables.
+
+Ensures data isolation, reducing accidental cross-tenant access.
+
+Simplifies queries: no need to filter by tenant ID in every operation.
+
+Supports scalability—new tenants only add metadata and collections.
+
+4. bcrypt for Password Hashing
+
+bcrypt provides safe, salted hashing designed specifically for passwords.
+
+Protects user/admin credentials even if the database is compromised.
+
+5. JWT for Stateless Authentication
+
+JWT tokens allow the service to remain stateless—no session storage required.
+
+The token embeds:
+
+admin_id
+
+organization
+
+Makes it easy to authorize tenant-specific actions.
+
+Signed with JWT_SECRET to prevent tampering.
+
+6. Token-Protected Destructive Actions
+
+Operations like delete organization require an Authorization header.
+
+Prevents someone from deleting orgs through direct calls without being authenticated.
+
+7. Simple Endpoint Structure
+
+CRUD-style /org/* endpoints provide predictable REST semantics.
+
+/admin/login separated for authentication flow.
+
+8. Master Database Approach
+
+All organizations reside in a single MongoDB database.
+
+Reduces connection overhead and simplifies deployments.
+
+Still provides strong tenant separation via naming conventions.
